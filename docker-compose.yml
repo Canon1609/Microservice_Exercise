@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: product_db_service
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  product_service:
+    build:
+      context: ./Product_Service
+      dockerfile: Dockerfile
+    image: product-service
+    container_name: product_service
+    depends_on:
+      - mariadb
+    restart: always
+    ports:
+      - "1234:1234"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/product_db_service
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+
+volumes:
+  mariadb_data:
